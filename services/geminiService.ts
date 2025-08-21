@@ -4,15 +4,22 @@ import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
-  // In a real app, you'd handle this more gracefully, but for this context, an error is fine.
-  throw new Error("API_KEY environment variable not set.");
+  console.warn("ZenithFit AI Coach is disabled: API_KEY environment variable not set. Please set it in your deployment environment.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
-let chat: Chat;
+let chat: Chat | null = null;
+
+export const isAiEnabled = (): boolean => {
+  return ai !== null;
+};
 
 export const startChat = () => {
+  if (!ai) {
+    chat = null;
+    return;
+  }
   chat = ai.chats.create({
     model: 'gemini-2.5-flash',
     config: {
@@ -27,10 +34,15 @@ export const startChat = () => {
   });
 };
 
-export const sendMessageStream = async (message: string): Promise<AsyncGenerator<GenerateContentResponse>> => {
+export const sendMessageStream = async (message: string): Promise<AsyncGenerator<GenerateContentResponse> | null> => {
   if (!chat) {
     startChat();
   }
+
+  if (!chat) {
+    return null;
+  }
+  
   const result = await chat.sendMessageStream({ message });
   return result;
 };

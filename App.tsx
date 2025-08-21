@@ -10,6 +10,7 @@ import CommunityScreen from './screens/CommunityScreen';
 import BottomNavBar from './components/BottomNavBar';
 import Chatbot from './components/Chatbot';
 import { ChatIcon } from './components/icons/ChatIcon';
+import { isAiEnabled } from './services/geminiService';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -82,13 +83,15 @@ const App: React.FC = () => {
         
         {isChatbotOpen && <Chatbot onClose={() => setIsChatbotOpen(false)} />}
         
-        <button
-          onClick={() => setIsChatbotOpen(true)}
-          className="absolute bottom-24 right-4 bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-full shadow-lg z-30 transition-transform transform hover:scale-110"
-          aria-label="Open AI Wellness Coach"
-        >
-          <ChatIcon className="w-6 h-6" />
-        </button>
+        {isAiEnabled() && (
+          <button
+            onClick={() => setIsChatbotOpen(true)}
+            className="absolute bottom-24 right-4 bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-full shadow-lg z-30 transition-transform transform hover:scale-110"
+            aria-label="Open AI Wellness Coach"
+          >
+            <ChatIcon className="w-6 h-6" />
+          </button>
+        )}
 
         <BottomNavBar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
       </div>
